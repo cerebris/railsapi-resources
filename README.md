@@ -1,8 +1,8 @@
 # Railsapi::Resources
 
-**Note: Railsapi Resources is an experiment at breaking out the Resource class from JSONAPI-Reources. This project 
+**Note: Railsapi Resources is an experiment at breaking out the Resource class from JSONAPI-Resources. This project 
 should be considered a work in progress and may be abandoned at any point. Also this README was quickly extracted from
-JR and certainly contains inaccurate information. In addition features may be added or removed at any point. Please do 
+JR and certainly contains inaccurate information. In addition features may be added or removed at any point. Please do
 not base production software on this library.**
 
 ## Table of Contents
