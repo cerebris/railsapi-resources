@@ -1,0 +1,12 @@
+<% comment_id = 0 %>
+<% for book_num in 0..4 %>
+  <% for comment_num in 0..50 %>
+book_<%= book_num %>_comment_<%= comment_num %>:
+  id: <%= comment_id %>
+  body: This is comment <%= comment_num %> on book <%= book_num %>.
+  author_id: <%= book_num.even? ? comment_id % 2 : (comment_id % 2) + 2 %>
+  book_id: <%= book_num %>
+  approved: <%= comment_num.even? %>
+  <% comment_id = comment_id + 1 %>
+  <% end %>
+<% end %>

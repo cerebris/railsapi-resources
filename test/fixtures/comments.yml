@@ -1,0 +1,21 @@
+post_1_dumb_post:
+  id: 1
+  post_id: 1
+  body: what a dumb post
+  author_id: 1
+
+post_1_i_liked_it:
+  id: 2
+  post_id: 1
+  body: i liked it
+  author_id: 2
+
+post_2_thanks_man:
+  id: 3
+  post_id: 2
+  body: Thanks man. Great post. But what is JR?
+  author_id: 2
+
+rogue_comment:
+  body: Rogue Comment Here
+  author_id: 3

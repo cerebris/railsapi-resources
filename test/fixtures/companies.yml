@@ -1,0 +1,4 @@
+firm1:
+  type: Firm
+  name: JSON Consulting Services
+  address: 456 1st Ave.

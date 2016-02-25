@@ -1,0 +1,20 @@
+post_1_dumb_post_whiny:
+  comment_id: 1
+  tag_id: 2
+
+post_1_dumb_post_short:
+  comment_id: 1
+  tag_id: 1
+
+post_1_i_liked_it_happy:
+  comment_id: 2
+  tag_id: 4
+
+post_1_i_liked_it_short:
+  comment_id: 2
+  tag_id: 1
+
+post_2_thanks_man_jr:
+  comment_id: 3
+  tag_id: 5
+

@@ -1,0 +1,9 @@
+a:
+  id: 1
+  person_id: 1
+  author_stuff: blah blah
+
+b:
+  id: 2
+  person_id: 2
+  author_stuff: blah blah blah

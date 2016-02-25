@@ -1,0 +1,7 @@
+<% for book_num in 0..999 %>
+book_<%= book_num %>:
+  id: <%= book_num %>
+  title: Book <%= book_num %>
+  isbn: 12345-<%= book_num %>-6789
+  banned: <%= book_num > 600 && book_num < 700 %>
+<% end %>

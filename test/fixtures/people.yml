@@ -1,0 +1,31 @@
+a:
+  id: 1
+  name: Joe Author
+  email: joe@xyz.fake
+  date_joined: <%= DateTime.parse('2013-08-07 20:25:00 UTC +00:00') %>
+  preferences_id: 1
+
+b:
+  id: 2
+  name: Fred Reader
+  email: fred@xyz.fake
+  date_joined: <%= DateTime.parse('2013-10-31 20:25:00 UTC +00:00') %>
+
+c:
+  id: 3
+  name: Lazy Author
+  email: lazy@xyz.fake
+  date_joined: <%= DateTime.parse('2013-10-31 21:25:00 UTC +00:00') %>
+
+d:
+  id: 4
+  name: Tag Crazy Author
+  email: taggy@xyz.fake
+  date_joined: <%= DateTime.parse('2013-11-30 4:20:00 UTC +00:00') %>
+
+e:
+  id: 5
+  name: Wilma Librarian
+  email: lib@xyz.fake
+  date_joined: <%= DateTime.parse('2013-11-30 4:20:00 UTC +00:00') %>
+  book_admin: true
