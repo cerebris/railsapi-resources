@@ -1,8 +1,7 @@
 module Railsapi
   class Relationship
     attr_reader :acts_as_set, :foreign_key, :type, :options, :name,
-                :class_name, :polymorphic, :always_include_linkage_data,
-                :parent_resource
+                :class_name, :polymorphic, :parent_resource
 
     def initialize(name, options = {})
       @name = name.to_s
@@ -12,7 +11,6 @@ module Railsapi
       @parent_resource = options[:parent_resource]
       @relation_name = options.fetch(:relation_name, @name)
       @polymorphic = options.fetch(:polymorphic, false) == true
-      @always_include_linkage_data = options.fetch(:always_include_linkage_data, false) == true
     end
 
     alias_method :polymorphic?, :polymorphic
