@@ -1,4 +1,4 @@
-module Railsapi
+module RailsAPI
   module ResourceRecords
     def self.included(base)
       base.class_eval do

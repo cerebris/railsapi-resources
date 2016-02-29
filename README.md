@@ -1,7 +1,7 @@
-# Railsapi::Resources
+# RailsAPI::Resources
 
-**Note: Railsapi Resources is an experiment at breaking out the Resource class from JSONAPI-Resources. This project 
-should be considered a work in progress and may be abandoned at any point. Also this README was quickly extracted from
+**Note: RailsAPI::Resources is an experiment that extracts the `Resource` class from [JSONAPI::Resources](https://github.com/cerebris/jsonapi-resources) ("JR"). This project
+should be considered a work in progress and may be abandoned at any point. This README was quickly extracted from
 JR and certainly contains inaccurate information. In addition features may be added or removed at any point. Please do
 not base production software on this library.**
 
@@ -10,7 +10,7 @@ not base production software on this library.**
 * [Installation] (#installation)
 * [Usage] (#usage)
   * [Resources] (#resources)
-    * [Railsapi::Resource] (#jsonapiresource)
+    * [RailsAPI::Resource] (#railsapiresource)
     * [Attributes] (#attributes)
     * [Primary Key] (#primary-key)
     * [Model Name] (#model-name)
@@ -46,14 +46,14 @@ Resource definitions should by convention be placed in a directory under app nam
 name should be the single underscored name of the model that backs the resource with `_resource.rb` appended. For example,
 a `Contact` model's resource should have a class named `ContactResource` defined in a file named `contact_resource.rb`.
 
-#### Railsapi::Resource
+#### RailsAPI::Resource
 
-Resources must be derived from `Railsapi::Resource`, or a class that is itself derived from `Railsapi::Resource`.
+Resources must be derived from `RailsAPI::Resource`, or a class that is itself derived from `RailsAPI::Resource`.
 
 For example:
 
 ```ruby
-class ContactResource < Railsapi::Resource
+class ContactResource < RailsAPI::Resource
 end
 ```
 
@@ -66,7 +66,7 @@ Because abstract resources do not expect to be backed by a model, they won't att
 or any of its relationships.
 
 ```ruby
-class BaseResource < Railsapi::Resource
+class BaseResource < RailsAPI::Resource
   abstract
 
   has_one :creator
@@ -86,7 +86,7 @@ Immutable resources can be used as the basis for a heterogeneous collection. Res
 still be mutated through their own type-specific endpoints.
 
 ```ruby
-class VehicleResource < Railsapi::Resource
+class VehicleResource < RailsAPI::Resource
   immutable
 
   has_one :owner
@@ -102,17 +102,7 @@ class BoatResource < VehicleResource
   attributes :length_at_water_line
   has_one :captain
 end
-
-# routes
-  jsonapi_resources :vehicles
-  jsonapi_resources :cars
-  jsonapi_resources :boats
-
 ```
-
-In the above example vehicles are immutable. A call to `/vehicles` or `/vehicles/1` will return vehicles with types
-of either `car` or `boat`. But calls to PUT or POST a `car` must be made to `/cars`. The rails models backing the above
-code use Single Table Inheritance.
 
 #### Attributes
 
@@ -122,7 +112,7 @@ the `attribute` method, and multiple attributes can be declared with the `attrib
 For example:
 
 ```ruby
-class ContactResource < Railsapi::Resource
+class ContactResource < RailsAPI::Resource
   attribute :name_first
   attributes :name_last, :email, :twitter
 end
@@ -137,7 +127,7 @@ This allows a resource's methods to access the underlying model.
 For example, a computed attribute for `full_name` could be defined as such:
 
 ```ruby
-class ContactResource < Railsapi::Resource
+class ContactResource < RailsAPI::Resource
   attributes :name_first, :name_last, :email, :twitter
   attribute :full_name
 
@@ -155,7 +145,7 @@ the `fetchable_fields` method.
 Here's an example that prevents guest users from seeing the `email` field:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   attributes :name, :email
   model_name 'Person'
   has_many :posts
@@ -181,7 +171,7 @@ the `update` or `create` methods, override the `self.updatable_fields` and `self
 This example prevents `full_name` from being set:
 
 ```ruby
-class ContactResource < Railsapi::Resource
+class ContactResource < RailsAPI::Resource
   attributes :name_first, :name_last, :full_name
 
   def full_name
@@ -205,15 +195,13 @@ By using the context you have the option to determine the creatable and updatabl
 
 ##### Sortable Attributes
 
-Railsapi Resources supports [sorting primary resources by multiple sort criteria](http://jsonapi.org/format/#fetching-sorting).
-
 By default all attributes are assumed to be sortable. To prevent some attributes from being sortable, override the
 `self.sortable_fields` method on a resource.
 
 Here's an example that prevents sorting by post's `body`:
 
 ```ruby
-class PostResource < Railsapi::Resource
+class PostResource < RailsAPI::Resource
   attributes :title, :body
 
   def self.sortable_fields(context)
@@ -239,7 +227,7 @@ class SpokenLanguage < ActiveRecord::Base
 end
 
 # Resource with getters and setter
-class PersonResource < Railsapi::Resource
+class PersonResource < RailsAPI::Resource
   attributes :name, :email, :spoken_languages
 
   # Getter
@@ -264,15 +252,7 @@ If the underlying model does not use `id` as the primary key _and_ does not supp
 must use the `primary_key` method to tell the resource which field on the model to use as the primary key. **Note:**
 this _must_ be the actual primary key of the model.
 
-By default only integer values are allowed for primary key. To change this behavior you can set the `resource_key_type`
-configuration option:
-
-```ruby
-JSONAPI.configure do |config|
-  # Allowed values are :integer(default), :uuid, :string, or a proc
-  config.resource_key_type = :uuid
-end
-```
+By default only integer values are used for primary key.
 
 ##### Override key type on a resource
 
@@ -280,21 +260,10 @@ You can override the default resource key type on a per-resource basis by callin
 with the same allowed values as the `resource_key_type` configuration option.
 
 ```ruby
-class ContactResource < Railsapi::Resource
+class ContactResource < RailsAPI::Resource
   attribute :id
   attributes :name_first, :name_last, :email, :twitter
   key_type :uuid
-end
-```
-
-##### Custom resource key validators
-
-If you need more control over the key, you can override the #verify_key method on your resource, or set a lambda that
-accepts key and context arguments in `config/initializers/jsonapi_resources.rb`:
-
-```ruby
-JSONAPI.configure do |config|
-  config.resource_key_type = -> (key, context) { key && String(key) }
 end
 ```
 
@@ -304,9 +273,11 @@ The name of the underlying model is inferred from the Resource name. It can be o
 method. For example:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
-  attribute :name
+class AuthorResource < RailsAPI::Resource
   model_name 'Person'
+
+  attribute :name
+
   has_many :posts
 end
 ```
@@ -320,7 +291,7 @@ resource names. It can also fail when using namespaced models. In this case a `m
 names to resources. For example:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   attribute :name
   model_name 'Person'
   model_hint model: Commenter, resource: :special_person
@@ -334,7 +305,7 @@ Note that when `model_name` is set a corresponding `model_hint` is also added. T
 `add_model_hint` option set to false. For example:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   model_name 'Legacy::Person', add_model_hint: false
 end
 ```
@@ -352,7 +323,7 @@ Here's a simple example using the `relationship` method where a post has a singl
 posts:
 
 ```ruby
-class PostResource < Railsapi::Resource
+class PostResource < RailsAPI::Resource
   attributes :title, :body
 
   relationship :author, to: :one
@@ -362,7 +333,7 @@ end
 And the corresponding author:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   attribute :name
 
   relationship :posts, to: :many
@@ -372,7 +343,7 @@ end
 And here's the equivalent resources using the `has_one` and `has_many` methods:
 
 ```ruby
-class PostResource < Railsapi::Resource
+class PostResource < RailsAPI::Resource
   attributes :title, :body
 
   has_one :author
@@ -382,7 +353,7 @@ end
 And the corresponding author:
 
 ```ruby
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   attribute :name
 
   has_many :posts
@@ -398,36 +369,36 @@ The relationship methods (`relationship`, `has_one`, and `has_many`) support the
  * `acts_as_set` - allows the entire set of related records to be replaced in one operation. Defaults to false if not set.
  * `polymorphic` - set to true to identify relationships that are polymorphic.
  * `relation_name` - the name of the relation to use on the model. A lambda may be provided which allows conditional selection of the relation based on the context.
- * `always_include_linkage_data` - if set to true, the relationship includes linkage data. Defaults to false if not set.
 
 `to_one` relationships support the additional option:
+
  * `foreign_key_on` - defaults to `:self`. To indicate that the foreign key is on the related resource specify `:related`.
 
 Examples:
 
 ```ruby
-class CommentResource < Railsapi::Resource
+class CommentResource < RailsAPI::Resource
   attributes :body
   has_one :post
   has_one :author, class_name: 'Person'
   has_many :tags, acts_as_set: true
 end
 
-class ExpenseEntryResource < Railsapi::Resource
+class ExpenseEntryResource < RailsAPI::Resource
   attributes :cost, :transaction_date
 
   has_one :currency, class_name: 'Currency', foreign_key: 'currency_code'
   has_one :employee
 end
 
-class TagResource < Railsapi::Resource
+class TagResource < RailsAPI::Resource
   attributes :name
   has_one :taggable, polymorphic: true
 end
 ```
 
 ```ruby
-class BookResource < Railsapi::Resource
+class BookResource < RailsAPI::Resource
 
   # Only book_admins may see unapproved comments for a book. Using
   # a lambda to select the correct relation on the model
@@ -449,8 +420,8 @@ The polymorphic relationship will require the resource and controller to exist, 
 error.
 
 ```ruby
-class TaggableResource < Railsapi::Resource; end
-class TaggablesController < Railsapi::ResourceController; end
+class TaggableResource < RailsAPI::Resource; end
+class TaggablesController < RailsAPI::ResourceController; end
 ```
 
 #### Callbacks
@@ -461,7 +432,7 @@ used to from `ActiveRecord`.
 For example, you might use a callback to perform authorization on your resource before an action.
 
 ```ruby
-class BaseResource < Railsapi::Resource
+class BaseResource < RailsAPI::Resource
   before_create :authorize_create
 
   def authorize_create
@@ -475,9 +446,9 @@ The types of supported callbacks are:
 - `after`
 - `around`
 
-##### `Railsapi::ResourceCallbacks`
+##### `RailsAPI::ResourceCallbacks`
 
-Callbacks can be defined for the following `Railsapi::Resource` events:
+Callbacks can be defined for the following `RailsAPI::Resource` events:
 
 - `:create`
 - `:update`
@@ -493,7 +464,7 @@ Callbacks can be defined for the following `Railsapi::Resource` events:
 
 #### Namespaces
 
-Railsapi::Resources supports namespacing of resources. With namespacing you can version your API.
+RailsAPI::Resources supports namespacing of resources. With namespacing you can version your API.
 
 ## Contributing
 

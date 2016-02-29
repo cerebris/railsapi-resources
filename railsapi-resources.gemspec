@@ -5,7 +5,7 @@ require 'railsapi/resources/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'railsapi-resources'
-  spec.version       = Railsapi::Resources::VERSION
+  spec.version       = RailsAPI::Resources::VERSION
   spec.authors       = ['Dan Gebhardt', 'Larry Gebhardt']
   spec.email         = ['dan@cerebris.com', 'larry@cerebris.com']
 

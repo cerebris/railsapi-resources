@@ -1,4 +1,4 @@
-module Railsapi
+module RailsAPI
   module Exceptions
     class Error < RuntimeError; end
 

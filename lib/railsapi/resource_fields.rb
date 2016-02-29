@@ -1,4 +1,4 @@
-module Railsapi
+module RailsAPI
   module ResourceFields
     def self.included(base)
       base.class_eval do
@@ -47,7 +47,7 @@ module Railsapi
           @save_needed = true
         rescue ArgumentError
           # :nocov: Will be thrown if an enum value isn't allowed for an enum. Currently not tested as enums are a rails 4.1 and higher feature
-          raise Railsapi::Exceptions::InvalidFieldValue.new(attribute, value)
+          raise RailsAPI::Exceptions::InvalidFieldValue.new(attribute, value)
           # :nocov:
         end
       end

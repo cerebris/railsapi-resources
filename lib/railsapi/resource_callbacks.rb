@@ -1,6 +1,6 @@
 require 'active_support/callbacks'
 
-module Railsapi
+module RailsAPI
   module ResourceCallbacks
     def self.included(base)
       base.class_eval do

@@ -1,4 +1,4 @@
-module Railsapi
+module RailsAPI
   class Relationship
     attr_reader :acts_as_set, :foreign_key, :type, :options, :name,
                 :class_name, :polymorphic, :parent_resource

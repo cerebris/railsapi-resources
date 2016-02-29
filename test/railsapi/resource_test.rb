@@ -1,6 +1,6 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-class Railsapi::ResourceTest < Minitest::Test
+class RailsAPI::ResourceTest < Minitest::Test
   def setup
     @post = Post.first
   end
@@ -23,12 +23,12 @@ class Railsapi::ResourceTest < Minitest::Test
 
   def test_resource_for_root_resource
     assert_raises NameError do
-      Railsapi::Resource.resource_for('related')
+      RailsAPI::Resource.resource_for('related')
     end
   end
 
   def test_resource_for_with_namespaced_paths
-    assert_equal(Railsapi::Resource.resource_for('my_module/related'), MyModule::RelatedResource)
+    assert_equal(RailsAPI::Resource.resource_for('my_module/related'), MyModule::RelatedResource)
     assert_equal(PostResource.resource_for('my_module/related'), MyModule::RelatedResource)
     assert_equal(MyModule::MyNamespacedResource.resource_for('my_module/related'), MyModule::RelatedResource)
   end
@@ -38,7 +38,7 @@ class Railsapi::ResourceTest < Minitest::Test
       ArticleResource.resource_for('related')
     end
     assert_raises NameError do
-      Railsapi::Resource.resource_for('related')
+      RailsAPI::Resource.resource_for('related')
     end
   end
 
@@ -116,7 +116,7 @@ class Railsapi::ResourceTest < Minitest::Test
     assert CatResource.verify_key('45')
     assert CatResource.verify_key(45)
 
-    assert_raises Railsapi::Exceptions::InvalidFieldValue do
+    assert_raises RailsAPI::Exceptions::InvalidFieldValue do
       CatResource.verify_key('45,345')
     end
 
@@ -134,7 +134,7 @@ class Railsapi::ResourceTest < Minitest::Test
     assert CatResource.verify_key('45')
     assert CatResource.verify_key(45)
 
-    assert_raises Railsapi::Exceptions::InvalidFieldValue do
+    assert_raises RailsAPI::Exceptions::InvalidFieldValue do
       CatResource.verify_key('45,345')
     end
 
@@ -151,7 +151,7 @@ class Railsapi::ResourceTest < Minitest::Test
 
     assert CatResource.verify_key('f1a4d5f2-e77a-4d0a-acbb-ee0b98b3f6b5')
 
-    assert_raises Railsapi::Exceptions::InvalidFieldValue do
+    assert_raises RailsAPI::Exceptions::InvalidFieldValue do
       CatResource.verify_key('f1a-e77a-4d0a-acbb-ee0b98b3f6b5')
     end
 
@@ -168,14 +168,14 @@ class Railsapi::ResourceTest < Minitest::Test
         if key.to_s.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
           key
         else
-          raise Railsapi::Exceptions::InvalidFieldValue.new(:id, key)
+          raise RailsAPI::Exceptions::InvalidFieldValue.new(:id, key)
         end
       }
     end
 
     assert CatResource.verify_key('f1a4d5f2-e77a-4d0a-acbb-ee0b98b3f6b5')
 
-    assert_raises Railsapi::Exceptions::InvalidFieldValue do
+    assert_raises RailsAPI::Exceptions::InvalidFieldValue do
       CatResource.verify_key('f1a-e77a-4d0a-acbb-ee0b98b3f6b5')
     end
 
@@ -187,7 +187,7 @@ class Railsapi::ResourceTest < Minitest::Test
 
   def test_links_resource_warning
     _out, err = capture_io do
-      eval "class LinksResource < Railsapi::Resource; end"
+      eval "class LinksResource < RailsAPI::Resource; end"
     end
     assert_match /LinksResource` is a reserved resource name/, err
   end
@@ -195,7 +195,7 @@ class Railsapi::ResourceTest < Minitest::Test
   def test_reserved_key_warnings
     _out, err = capture_io do
       eval <<-CODE
-        class BadlyNamedAttributesResource < Railsapi::Resource
+        class BadlyNamedAttributesResource < RailsAPI::Resource
           attributes :type
         end
       CODE
@@ -207,7 +207,7 @@ class Railsapi::ResourceTest < Minitest::Test
     %w(id type).each do |key|
       _out, err = capture_io do
         eval <<-CODE
-          class BadlyNamedAttributesResource < Railsapi::Resource
+          class BadlyNamedAttributesResource < RailsAPI::Resource
             has_one :#{key}
           end
         CODE
@@ -217,7 +217,7 @@ class Railsapi::ResourceTest < Minitest::Test
     %w(types ids).each do |key|
       _out, err = capture_io do
         eval <<-CODE
-          class BadlyNamedAttributesResource < Railsapi::Resource
+          class BadlyNamedAttributesResource < RailsAPI::Resource
             has_many :#{key}
           end
         CODE
@@ -229,18 +229,18 @@ class Railsapi::ResourceTest < Minitest::Test
   def test_abstract_warning
     _out, err = capture_io do
       eval <<-CODE
-        class NoModelResource < Railsapi::Resource
+        class NoModelResource < RailsAPI::Resource
         end
         NoModelResource._model_class
       CODE
     end
-    assert_match "[MODEL NOT FOUND] Model could not be found for Railsapi::ResourceTest::NoModelResource. If this a base Resource declare it as abstract.\n", err
+    assert_match "[MODEL NOT FOUND] Model could not be found for RailsAPI::ResourceTest::NoModelResource. If this a base Resource declare it as abstract.\n", err
   end
 
   def test_no_warning_when_abstract
     _out, err = capture_io do
       eval <<-CODE
-        class NoModelAbstractResource < Railsapi::Resource
+        class NoModelAbstractResource < RailsAPI::Resource
           abstract
         end
         NoModelAbstractResource._model_class
@@ -252,7 +252,7 @@ class Railsapi::ResourceTest < Minitest::Test
   def test_correct_error_surfaced_if_validation_errors_in_after_save_callback
     post = PostWithBadAfterSave.find(1)
     post_resource = ArticleWithBadAfterSaveResource.new(post, nil)
-    err = assert_raises Railsapi::Exceptions::ValidationErrors do
+    err = assert_raises RailsAPI::Exceptions::ValidationErrors do
       post_resource.replace_fields({:attributes => {:title => 'Some title'}})
     end
     assert_equal(err.error_messages[:base], ['Boom! Error added in after_save callback.'])

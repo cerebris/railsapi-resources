@@ -1,6 +1,6 @@
 require 'railsapi/relationship'
 
-module Railsapi
+module RailsAPI
   module ResourceRelationships
     def self.included(base)
       base.class_eval do
@@ -83,8 +83,8 @@ module Railsapi
           @_relationships[relationship_name] = relationship = klass.new(relationship_name, options)
 
           associated_records_method_name = case relationship
-                                             when Railsapi::Relationship::ToOne then "record_for_#{relationship_name}"
-                                             when Railsapi::Relationship::ToMany then "records_for_#{relationship_name}"
+                                             when RailsAPI::Relationship::ToOne then "record_for_#{relationship_name}"
+                                             when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
                                            end
 
           foreign_key = relationship.foreign_key
@@ -99,7 +99,7 @@ module Railsapi
             records_for(relation_name)
           end unless method_defined?(associated_records_method_name)
 
-          if relationship.is_a?(Railsapi::Relationship::ToOne)
+          if relationship.is_a?(RailsAPI::Relationship::ToOne)
             if relationship.belongs_to?
               define_method foreign_key do
                 @model.method(foreign_key).call
@@ -139,7 +139,7 @@ module Railsapi
                 end
               end unless method_defined?(relationship_name)
             end
-          elsif relationship.is_a?(Railsapi::Relationship::ToMany)
+          elsif relationship.is_a?(RailsAPI::Relationship::ToMany)
             define_method foreign_key do
               records = public_send(associated_records_method_name)
               return records.collect do |record|
@@ -232,7 +232,7 @@ module Railsapi
         if relation.nil?
           @model.public_send(relation_name) << related_resource._model
         else
-          fail Railsapi::Exceptions::HasManyRelationExists.new(relationship_key_value)
+          fail RailsAPI::Exceptions::HasManyRelationExists.new(relationship_key_value)
         end
       end
 

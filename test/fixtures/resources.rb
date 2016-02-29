@@ -1,7 +1,7 @@
 require 'railsapi-resources'
 
 ### RESOURCES
-class BaseResource < Railsapi::Resource
+class BaseResource < RailsAPI::Resource
   abstract
 end
 
@@ -27,28 +27,28 @@ class SpecialPersonResource < SpecialBaseResource
   model_name 'Person'
 end
 
-class CommentResource < Railsapi::Resource
+class CommentResource < RailsAPI::Resource
   attributes :body
   has_one :post
   has_one :author, class_name: 'Person'
   has_many :tags
 end
 
-class CompanyResource < Railsapi::Resource
+class CompanyResource < RailsAPI::Resource
   attributes :name, :address
 end
 
 class FirmResource < CompanyResource
 end
 
-class TagResource < Railsapi::Resource
+class TagResource < RailsAPI::Resource
   attributes :name
 
   has_many :posts
 end
 
 
-class PostResource < Railsapi::Resource
+class PostResource < RailsAPI::Resource
   attribute :title
   attribute :body
   attribute :subject
@@ -119,12 +119,12 @@ class PostResource < Railsapi::Resource
 
   def self.verify_key(key, context = nil)
     super(key)
-    raise Railsapi::Exceptions::RecordNotFound.new(key) unless find_by_key(key, context: context)
+    raise RailsAPI::Exceptions::RecordNotFound.new(key) unless find_by_key(key, context: context)
     return key
   end
 end
 
-class PreferencesResource < Railsapi::Resource
+class PreferencesResource < RailsAPI::Resource
   attribute :advanced_mode
 
   has_one :author, :foreign_key_on => :related
@@ -134,16 +134,16 @@ class PreferencesResource < Railsapi::Resource
   end
 end
 
-class AuthorResource < Railsapi::Resource
+class AuthorResource < RailsAPI::Resource
   model_name 'Person'
   attributes :name
 end
 
-class BookResource < Railsapi::Resource
+class BookResource < RailsAPI::Resource
   has_many :authors, class_name: 'Author'
 end
 
-class AuthorDetailResource < Railsapi::Resource
+class AuthorDetailResource < RailsAPI::Resource
   attributes :author_stuff
 end
 
@@ -153,7 +153,7 @@ module Api
     # class PersonResource < PersonResource; end
     # class PostResource < PostResource; end
 
-    class BookResource < Railsapi::Resource
+    class BookResource < RailsAPI::Resource
       attribute :title
       attributes :isbn, :banned
 
@@ -181,7 +181,7 @@ module Api
       end
     end
 
-    class BookCommentResource < Railsapi::Resource
+    class BookCommentResource < RailsAPI::Resource
       attributes :body, :approved
 
       has_one :book
@@ -200,7 +200,7 @@ module Api
   end
 end
 
-class ArticleResource < Railsapi::Resource
+class ArticleResource < RailsAPI::Resource
   model_name 'Post'
 end
 
@@ -214,19 +214,19 @@ class PostWithBadAfterSave < ActiveRecord::Base
   end
 end
 
-class ArticleWithBadAfterSaveResource < Railsapi::Resource
+class ArticleWithBadAfterSaveResource < RailsAPI::Resource
   model_name 'PostWithBadAfterSave'
   attribute :title
 end
 
-class NoMatchResource < Railsapi::Resource
+class NoMatchResource < RailsAPI::Resource
 end
 
-class NoMatchAbstractResource < Railsapi::Resource
+class NoMatchAbstractResource < RailsAPI::Resource
   abstract
 end
 
-class CatResource < Railsapi::Resource
+class CatResource < RailsAPI::Resource
   attribute :name
   attribute :breed
 
@@ -235,12 +235,12 @@ class CatResource < Railsapi::Resource
 end
 
 module MyModule
-  class MyNamespacedResource < Railsapi::Resource
+  class MyNamespacedResource < RailsAPI::Resource
     model_name "Person"
     has_many :related
   end
 
-  class RelatedResource < Railsapi::Resource
+  class RelatedResource < RailsAPI::Resource
     model_name "Comment"
   end
 end
@@ -255,7 +255,7 @@ end
 
 module Api
   module V8
-    class NumeroTelefoneResource < Railsapi::Resource
+    class NumeroTelefoneResource < RailsAPI::Resource
       attribute :numero_telefone
     end
   end

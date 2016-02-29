@@ -4,7 +4,7 @@ require 'railsapi/resource_attributes'
 require 'railsapi/resource_fields'
 require 'railsapi/resource_records'
 
-module Railsapi
+module RailsAPI
   class Resource
     include ResourceCallbacks
     include ResourceRelationships
@@ -98,16 +98,16 @@ module Railsapi
     # ```
     def _save
       unless @model.valid?
-        fail Railsapi::Exceptions::ValidationErrors.new(self)
+        fail RailsAPI::Exceptions::ValidationErrors.new(self)
       end
 
       if defined? @model.save
         saved = @model.save(validate: false)
         unless saved
           if @model.errors.present?
-            fail Railsapi::Exceptions::ValidationErrors.new(self)
+            fail RailsAPI::Exceptions::ValidationErrors.new(self)
           else
-            fail Railsapi::Exceptions::SaveFailed.new
+            fail RailsAPI::Exceptions::SaveFailed.new
           end
         end
       else
@@ -121,7 +121,7 @@ module Railsapi
 
     def _remove
       unless @model.destroy
-        fail Railsapi::Exceptions::ValidationErrors.new(self)
+        fail RailsAPI::Exceptions::ValidationErrors.new(self)
       end
       :completed
     end
@@ -161,7 +161,7 @@ module Railsapi
         resource_name = _resource_name_from_type(type_with_module)
         resource = resource_name.safe_constantize if resource_name
         if resource.nil?
-          fail NameError, "Railsapi: Could not find resource '#{type}'. (Class #{resource_name} not found)"
+          fail NameError, "RailsAPI: Could not find resource '#{type}'. (Class #{resource_name} not found)"
         end
         resource
       end
@@ -199,7 +199,7 @@ module Railsapi
 
       def model_hint(model: _model_name, resource: _type)
         model_name = ((model.is_a?(Class)) && (model < ActiveRecord::Base)) ? model.name : model
-        resource_type = ((resource.is_a?(Class)) && (resource < Railsapi::Resource)) ? resource._type : resource.to_s
+        resource_type = ((resource.is_a?(Class)) && (resource < RailsAPI::Resource)) ? resource._type : resource.to_s
 
         _model_hints[model_name.to_s.gsub('::', '/').underscore] = resource_type.to_s
       end
@@ -234,7 +234,7 @@ module Railsapi
         when :string
           return if key.nil?
           if key.to_s.include?(',')
-            raise Railsapi::Exceptions::InvalidFieldValue.new(:id, key)
+            raise RailsAPI::Exceptions::InvalidFieldValue.new(:id, key)
           else
             key
           end
@@ -243,13 +243,13 @@ module Railsapi
           if key.to_s.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
             key
           else
-            raise Railsapi::Exceptions::InvalidFieldValue.new(:id, key)
+            raise RailsAPI::Exceptions::InvalidFieldValue.new(:id, key)
           end
         else
           key_type.call(key, context)
         end
       rescue
-        raise Railsapi::Exceptions::InvalidFieldValue.new(:id, key)
+        raise RailsAPI::Exceptions::InvalidFieldValue.new(:id, key)
       end
 
       # override to allow for key processing and checking
@@ -301,7 +301,7 @@ module Railsapi
       end
 
       def module_path
-        if name == 'Railsapi::Resource'
+        if name == 'RailsAPI::Resource'
           ''
         else
           name =~ /::[^:]+\Z/ ? ($`.freeze.gsub('::', '/') + '/').underscore : ''
