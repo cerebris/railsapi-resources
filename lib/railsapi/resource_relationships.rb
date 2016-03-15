@@ -82,16 +82,26 @@ module RailsAPI
 
           @_relationships[relationship_name] = relationship = klass.new(relationship_name, options)
 
-          associated_records_method_name = case relationship
-                                             when RailsAPI::Relationship::ToOne then "record_for_#{relationship_name}"
-                                             when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
-                                           end
-
           foreign_key = relationship.foreign_key
 
           define_method "#{foreign_key}=" do |value|
             @model.method("#{foreign_key}=").call(value)
           end unless method_defined?("#{foreign_key}=")
+
+          # Resources for relationships are returned through the dynamically generated method named for the
+          # relationship (for example `has_many :comments` will create a method named `comments` on the resource).  This
+          # method must return a single Resource for a `has_one` and an array of Resources for a `has_many`
+          # relationship.
+          #
+          # In addition ActiveRecord Relation records for each relationship are retrieved through a dynamically
+          # generated method named for the relationship (`record(s)_for_<relationship_name>). This in turn calls
+          # the standard `records_for` method, which can be overridden for common code related to retrieving related
+          # records.
+
+          associated_records_method_name = case relationship
+                                             when RailsAPI::Relationship::ToOne then "record_for_#{relationship_name}"
+                                             when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
+                                           end
 
           define_method associated_records_method_name do
             relationship = self.class._relationships[relationship_name]
