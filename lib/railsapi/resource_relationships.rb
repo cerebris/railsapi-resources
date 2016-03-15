@@ -73,7 +73,7 @@ module RailsAPI
           check_reserved_relationship_name(relationship_name)
 
           # Initialize from an ActiveRecord model's properties
-          if _model_class && _model_class.ancestors.collect{|ancestor| ancestor.name}.include?('ActiveRecord::Base')
+          if is_active_record_model?
             model_association = _model_class.reflect_on_association(relationship_name)
             if model_association
               options[:class_name] ||= model_association.class_name

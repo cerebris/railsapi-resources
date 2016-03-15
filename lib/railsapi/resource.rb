@@ -310,6 +310,10 @@ module RailsAPI
 
       private
 
+      def is_active_record_model?
+        _model_class && _model_class.ancestors.collect{|ancestor| ancestor.name}.include?('ActiveRecord::Base')
+      end
+
       def check_reserved_resource_name(type, name)
         if [:ids, :types, :hrefs, :links].include?(type)
           warn "[NAME COLLISION] `#{name}` is a reserved resource name."
