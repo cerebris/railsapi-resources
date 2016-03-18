@@ -2,7 +2,6 @@ require 'railsapi/resource_callbacks'
 require 'railsapi/resource_relationships'
 require 'railsapi/resource_attributes'
 require 'railsapi/resource_fields'
-require 'railsapi/resource_records'
 
 module RailsAPI
   class Resource
@@ -10,7 +9,6 @@ module RailsAPI
     include ResourceRelationships
     include ResourceAttributes
     include ResourceFields
-    include ResourceRecords
 
     attr_reader :context
 

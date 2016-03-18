@@ -103,10 +103,8 @@ module RailsAPI
                                              when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
                                            end
 
-          define_method associated_records_method_name do
-            relationship = self.class._relationships[relationship_name]
-            relation_name = relationship.relation_name(context: @context)
-            records_for(relation_name)
+          define_method associated_records_method_name do |options = {}|
+            records_for_relationship(relationship_name, options)
           end unless method_defined?(associated_records_method_name)
 
           if relationship.is_a?(RailsAPI::Relationship::ToOne)
@@ -161,11 +159,8 @@ module RailsAPI
               relationship = self.class._relationships[relationship_name]
 
               resource_klass = relationship.resource_klass
-              records = public_send(associated_records_method_name)
 
-              records = resource_klass.apply_filters(records, options)
-              records = resource_klass.apply_sort(records, options)
-              records = resource_klass.apply_pagination(records, options)
+              records = public_send(associated_records_method_name, options)
 
               return records.collect do |record|
                 if relationship.polymorphic?
@@ -227,6 +222,12 @@ module RailsAPI
     # are fetched for a model. Particularly helpful for authorization.
     def records_for(relation_name)
       _model.public_send relation_name
+    end
+
+    def records_for_relationship(relationship_name, _options = {})
+      relationship = self.class._relationships[relationship_name]
+      relation_name = relationship.relation_name(context: @context)
+      records_for(relation_name)
     end
 
     private
