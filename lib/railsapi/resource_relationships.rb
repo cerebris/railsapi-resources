@@ -73,7 +73,7 @@ module RailsAPI
           check_reserved_relationship_name(relationship_name)
 
           # Initialize from an ActiveRecord model's properties
-          if _model_class && _model_class.ancestors.collect{|ancestor| ancestor.name}.include?('ActiveRecord::Base')
+          if is_active_record_model?
             model_association = _model_class.reflect_on_association(relationship_name)
             if model_association
               options[:class_name] ||= model_association.class_name
@@ -82,21 +82,29 @@ module RailsAPI
 
           @_relationships[relationship_name] = relationship = klass.new(relationship_name, options)
 
-          associated_records_method_name = case relationship
-                                             when RailsAPI::Relationship::ToOne then "record_for_#{relationship_name}"
-                                             when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
-                                           end
-
           foreign_key = relationship.foreign_key
 
           define_method "#{foreign_key}=" do |value|
             @model.method("#{foreign_key}=").call(value)
           end unless method_defined?("#{foreign_key}=")
 
-          define_method associated_records_method_name do
-            relationship = self.class._relationships[relationship_name]
-            relation_name = relationship.relation_name(context: @context)
-            records_for(relation_name)
+          # Resources for relationships are returned through the dynamically generated method named for the
+          # relationship (for example `has_many :comments` will create a method named `comments` on the resource).  This
+          # method must return a single Resource for a `has_one` and an array of Resources for a `has_many`
+          # relationship.
+          #
+          # In addition ActiveRecord Relation records for each relationship are retrieved through a dynamically
+          # generated method named for the relationship (`record(s)_for_<relationship_name>). This in turn calls
+          # the standard `records_for` method, which can be overridden for common code related to retrieving related
+          # records.
+
+          associated_records_method_name = case relationship
+                                             when RailsAPI::Relationship::ToOne then "record_for_#{relationship_name}"
+                                             when RailsAPI::Relationship::ToMany then "records_for_#{relationship_name}"
+                                           end
+
+          define_method associated_records_method_name do |options = {}|
+            records_for_relationship(relationship_name, options)
           end unless method_defined?(associated_records_method_name)
 
           if relationship.is_a?(RailsAPI::Relationship::ToOne)
@@ -151,11 +159,8 @@ module RailsAPI
               relationship = self.class._relationships[relationship_name]
 
               resource_klass = relationship.resource_klass
-              records = public_send(associated_records_method_name)
 
-              records = resource_klass.apply_filters(records, options)
-              records = resource_klass.apply_sort(records, options)
-              records = resource_klass.apply_pagination(records, options)
+              records = public_send(associated_records_method_name, options)
 
               return records.collect do |record|
                 if relationship.polymorphic?
@@ -217,6 +222,12 @@ module RailsAPI
     # are fetched for a model. Particularly helpful for authorization.
     def records_for(relation_name)
       _model.public_send relation_name
+    end
+
+    def records_for_relationship(relationship_name, _options = {})
+      relationship = self.class._relationships[relationship_name]
+      relation_name = relationship.relation_name(context: @context)
+      records_for(relation_name)
     end
 
     private

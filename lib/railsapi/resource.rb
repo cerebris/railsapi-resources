@@ -2,7 +2,6 @@ require 'railsapi/resource_callbacks'
 require 'railsapi/resource_relationships'
 require 'railsapi/resource_attributes'
 require 'railsapi/resource_fields'
-require 'railsapi/resource_records'
 
 module RailsAPI
   class Resource
@@ -10,7 +9,6 @@ module RailsAPI
     include ResourceRelationships
     include ResourceAttributes
     include ResourceFields
-    include ResourceRecords
 
     attr_reader :context
 
@@ -309,6 +307,10 @@ module RailsAPI
       end
 
       private
+
+      def is_active_record_model?
+        _model_class && _model_class.ancestors.collect{|ancestor| ancestor.name}.include?('ActiveRecord::Base')
+      end
 
       def check_reserved_resource_name(type, name)
         if [:ids, :types, :hrefs, :links].include?(type)
